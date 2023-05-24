@@ -7,9 +7,7 @@ import 'package:flutterproject_second/utils/widget_functions.dart';
 import 'package:flutterproject_second/utils/http.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
-
-final double padding = 25;
-final sidePadding = EdgeInsets.symmetric(horizontal: padding, vertical: 0);
+import 'package:flutterproject_second/screen/LandingScreen.dart';
 
 class CamScreen extends StatefulWidget {
   @override
@@ -18,20 +16,20 @@ class CamScreen extends StatefulWidget {
 
 class _CamScreen extends State<CamScreen> {
 
+  bool _isclick = false;
+
   String videosource = "rtsp://211.21.74.23:8554/stream1";
-  VideoPlayerController? _controller;
   VlcPlayerController? _vlccontroller;
 
-  late Future<void> _VedioPlayerFuture;
+  late Future<void> _vlcplayerfuture;
 
   @override
   void initState() {
-    _controller = VideoPlayerController.network(videosource);
     _vlccontroller = VlcPlayerController.network(videosource,hwAcc: HwAcc.full,
-      autoPlay: false,
+      autoPlay: true,
       options: VlcPlayerOptions(),);
+    _vlcplayerfuture = _vlccontroller!.initialize();
 
-    _VedioPlayerFuture = _controller!.initialize();
 
       // ..initialize().then((_) {
       //   setState(() {});
@@ -40,7 +38,6 @@ class _CamScreen extends State<CamScreen> {
   }
 
   Future<void> dispose() async {
-    _controller!.dispose();
     await _vlccontroller!.stopRendererScanning();
     await _vlccontroller!.dispose();
     super.dispose();
@@ -118,25 +115,25 @@ class _CamScreen extends State<CamScreen> {
                             topRight: Radius.circular(15),
                             topLeft: Radius.circular(15),
                           ),
-                          child: VlcPlayer(
-                            controller: _vlccontroller!,
-                            aspectRatio: 16 / 9,
-                            placeholder: Center(child: CircularProgressIndicator()),
+
+                          child: FutureBuilder(
+                            future: _vlcplayerfuture,
+                            builder: (context,snapshot){
+                              if (snapshot.connectionState == ConnectionState.done){
+                                return AspectRatio(
+                                    aspectRatio: _vlccontroller!.value.aspectRatio,
+                                  child: VlcPlayer(
+                                    controller: _vlccontroller!,
+                                    aspectRatio: 16 / 9,
+                                    placeholder: Center(child: CircularProgressIndicator()),
+                                  ),
+                                );
+                              }
+                              else{
+                                return Center(child: CircularProgressIndicator(),);
+                              }
+                            },
                           ),
-                          // child: FutureBuilder(
-                          //   future: _VedioPlayerFuture,
-                          //   builder: (context,snapshot){
-                          //     if (snapshot.connectionState == ConnectionState.done){
-                          //       return AspectRatio(
-                          //           aspectRatio: _controller!.value.aspectRatio,
-                          //         child: VideoPlayer(_controller!),
-                          //       );
-                          //     }
-                          //     else{
-                          //       return Center(child: CircularProgressIndicator(),);
-                          //     }
-                          //   },
-                          // ),
 
                           // child: _controller!.value.isInitialized
                           //     ?AspectRatio(aspectRatio: _controller!.value.aspectRatio,
@@ -176,9 +173,12 @@ class _CamScreen extends State<CamScreen> {
                         children: [
                           GestureDetector(
                             onTap: (){
-                              _controller!.value.isPlaying ?
-                                  _controller!.pause():
-                                  _controller!.play();
+                              _vlccontroller!.value.isPlaying ?
+                                  _vlccontroller!.pause():
+                                  _vlccontroller!.play();
+                              setState(() {
+                                _isclick = !_isclick;
+                              });
                             },
                             child: Container(
                               margin: EdgeInsets.symmetric(vertical: 5),
@@ -189,17 +189,16 @@ class _CamScreen extends State<CamScreen> {
                                 borderRadius: BorderRadius.circular(90),
                               ),
                               child: Center(
-                                child: Icon(Icons.play_arrow),
+                                child: Icon(_isclick?Icons.play_arrow:Icons.pause),
                               ),
                             ),
                           ),
                           GestureDetector(
                             onTap: ()async{
-                              setState(() {
 
-                              });
-                              await(_controller!.initialize());
-                              _controller!.play();
+                              await(_vlccontroller!.initialize());
+                              _vlccontroller!.play();
+                              //dispose();
                             },
                             child: Container(
                               margin: EdgeInsets.symmetric(vertical:5),
