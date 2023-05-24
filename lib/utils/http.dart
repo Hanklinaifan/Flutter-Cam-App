@@ -5,7 +5,8 @@ import 'dart:convert';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 //url網址
-final String comurl = "https://newmainpy-1-c9615948.deta.app";
+final String detaurl = "https://newmainpy-1-c9615948.deta.app";
+final String comurl = "http://211.21.74.23:8088";
 final String phoneurl = "http://10.0.2.2:8000";
 
 //url回傳response

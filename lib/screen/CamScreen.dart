@@ -6,6 +6,7 @@ import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
 import 'package:flutterproject_second/utils/http.dart';
 import 'package:video_player/video_player.dart';
+import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 
 final double padding = 25;
 final sidePadding = EdgeInsets.symmetric(horizontal: padding, vertical: 0);
@@ -17,25 +18,31 @@ class CamScreen extends StatefulWidget {
 
 class _CamScreen extends State<CamScreen> {
 
-  String videosource = "https://redirector.googlevideo.com/videoplayback?expire=1684245895&ei=JjljZL7jO5mq1gKK35r4DA&ip=2001%3A19f0%3A6c01%3A27ff%3A8186%3A3220%3A8ca8%3Ad0ca&id=o-AE4vv6XQasULmJsPJJQU4DPlHR3Tn9nyAVXqj1y6Erpl&itag=22&source=youtube&requiressl=yes&mh=Te&mm=31%2C26&mn=sn-4g5lznl6%2Csn-5hne6nzd&ms=au%2Conr&mv=m&mvi=4&pl=48&initcwndbps=756250&spc=qEK7B6S2L5lmTS3ag2tg3iZD6zh5Qew&vprv=1&svpuc=1&mime=video%2Fmp4&cnr=14&ratebypass=yes&dur=307.525&lmt=1673490642044087&mt=1684223821&fvip=3&fexp=24007246%2C51000023&c=ANDROID&txp=4532434&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Ccnr%2Cratebypass%2Cdur%2Clmt&sig=AOq0QJ8wRQIhALTZ_HyOnolAhLqeJrtMqg7gVjNAIUw4LMmqPzm81hrzAiBb5_nOh7nv5_0rYqxDVi_BK31VnNNbAfktIDtO3O2OoA%3D%3D&lsparams=mh%2Cmm%2Cmn%2Cms%2Cmv%2Cmvi%2Cpl%2Cinitcwndbps&lsig=AG3C_xAwRgIhAKI4GssHbCiOa8FuwIsmYWfjCMMWo3C-rRBj3YO_7NdoAiEAi_SM1KRrA710MDOCTEXVJi23Onf8_x6Q9VIk4JZy8Bk%3D&title=BASI%20%20%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AB%E3%81%AF%20(Official%20Video)";
-
+  String videosource = "rtsp://211.21.74.23:8554/stream1";
   VideoPlayerController? _controller;
+  VlcPlayerController? _vlccontroller;
 
   late Future<void> _VedioPlayerFuture;
 
   @override
   void initState() {
     _controller = VideoPlayerController.network(videosource);
+    _vlccontroller = VlcPlayerController.network(videosource,hwAcc: HwAcc.full,
+      autoPlay: false,
+      options: VlcPlayerOptions(),);
 
     _VedioPlayerFuture = _controller!.initialize();
+
       // ..initialize().then((_) {
       //   setState(() {});
       // });
     super.initState();
   }
-  void dispose(){
-    _controller!.dispose();
 
+  Future<void> dispose() async {
+    _controller!.dispose();
+    await _vlccontroller!.stopRendererScanning();
+    await _vlccontroller!.dispose();
     super.dispose();
   }
 
@@ -111,20 +118,25 @@ class _CamScreen extends State<CamScreen> {
                             topRight: Radius.circular(15),
                             topLeft: Radius.circular(15),
                           ),
-                          child: FutureBuilder(
-                            future: _VedioPlayerFuture,
-                            builder: (context,snapshot){
-                              if (snapshot.connectionState == ConnectionState.done){
-                                return AspectRatio(
-                                    aspectRatio: _controller!.value.aspectRatio,
-                                  child: VideoPlayer(_controller!),
-                                );
-                              }
-                              else{
-                                return Center(child: CircularProgressIndicator(),);
-                              }
-                            },
+                          child: VlcPlayer(
+                            controller: _vlccontroller!,
+                            aspectRatio: 16 / 9,
+                            placeholder: Center(child: CircularProgressIndicator()),
                           ),
+                          // child: FutureBuilder(
+                          //   future: _VedioPlayerFuture,
+                          //   builder: (context,snapshot){
+                          //     if (snapshot.connectionState == ConnectionState.done){
+                          //       return AspectRatio(
+                          //           aspectRatio: _controller!.value.aspectRatio,
+                          //         child: VideoPlayer(_controller!),
+                          //       );
+                          //     }
+                          //     else{
+                          //       return Center(child: CircularProgressIndicator(),);
+                          //     }
+                          //   },
+                          // ),
 
                           // child: _controller!.value.isInitialized
                           //     ?AspectRatio(aspectRatio: _controller!.value.aspectRatio,
