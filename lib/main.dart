@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutterproject_second/screen/AddCamScreen.dart';
 import 'package:flutterproject_second/screen/AllsusScreen.dart';
 import 'package:flutterproject_second/screen/CamScreen.dart';
+import 'package:flutterproject_second/screen/FullCamScreen.dart';
 import 'package:flutterproject_second/screen/LandingScreen.dart';
 import 'package:flutterproject_second/screen/ModeScreen.dart';
 import 'package:flutterproject_second/screen/NoticeScreen.dart';
@@ -127,6 +128,7 @@ class Myapp extends StatelessWidget {
           '/AddCamScreen': (_) => new AddCamScreen(),
           '/SettingScreen': (_) => new SettingScreen(),
           '/NoticeScreen': (_) => new NoticeScreen(),
+          '/FullCamScreen': (_) => new FullCamScreen(),
         });
   }
 }
