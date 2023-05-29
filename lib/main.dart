@@ -128,7 +128,7 @@ class Myapp extends StatelessWidget {
           '/AddCamScreen': (_) => new AddCamScreen(),
           '/SettingScreen': (_) => new SettingScreen(),
           '/NoticeScreen': (_) => new NoticeScreen(),
-          '/FullCamScreen': (_) => new FullCamScreen(),
+          // '/FullCamScreen': (_) => new FullCamScreen(),
         });
   }
 }

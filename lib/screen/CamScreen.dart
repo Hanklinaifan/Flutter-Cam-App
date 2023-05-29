@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterproject_second/custom/Showup.dart';
+import 'package:flutterproject_second/screen/FullCamScreen.dart';
 import 'package:flutterproject_second/screen/httptestScreen.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
@@ -21,7 +22,7 @@ class CamScreen extends StatefulWidget {
 }
 
 class _CamScreen extends State<CamScreen> {
-  bool _isclick = true;
+  bool _isclick = true ;
   bool _istouched = true;
 
   String videosource = "rtsp://Hank_MA303:ZH_MA303@192.168.0.170/stream1";
@@ -57,14 +58,16 @@ class _CamScreen extends State<CamScreen> {
         [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
   }
 
-
   Widget build(BuildContext context) {
+
     final Size mediasize = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
     dynamic roominfo = ModalRoute.of(context)?.settings.arguments;
     var roomindex = roominfo['index'];
     String? roomname = ROOM_DATA[roomindex]['room'];
-    print(mediasize);
+
+
+
     return Scaffold(
         backgroundColor: COLOR_BACKGROUND[100],
         body: Container(
@@ -205,8 +208,21 @@ class _CamScreen extends State<CamScreen> {
                               bottom: 5,
                               child: ShowUp(
                                 delay: 5,
-                                child: Icon(Icons.fullscreen_sharp,
-                                      color: Colors.white),
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    _vlccontroller!.stop();
+                                    setState(() {
+                                      _isclick = true;
+                                    });
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (context) =>
+                                            FullCamScreen(vlcsource: videosource),
+                                        )
+                                    );
+                                  },
+                                  child: Icon(Icons.fullscreen_sharp,
+                                        color: Colors.white),
+                                ),
                               ),
                             ):SizedBox.shrink(),
                           ],
@@ -267,14 +283,15 @@ class _CamScreen extends State<CamScreen> {
                           ),
                           GestureDetector(
                             onTap: () async {
-                              _vlccontroller!.pause();
-                              Navigator.pushNamed(
-                                context,
-                                "/FullCamScreen",
-                                arguments: {'controller' : _vlccontroller,'vlcurl' : videosource}
+                              _vlccontroller!.stop();
+                              setState(() {
+                                _isclick = true;
+                              });
+                              Navigator.of(context).push(
+                                MaterialPageRoute(builder: (context) =>
+                                      FullCamScreen(vlcsource: videosource),
+                                )
                               );
-
-
                             },
                             child: Container(
                               margin: EdgeInsets.symmetric(vertical: 5),
