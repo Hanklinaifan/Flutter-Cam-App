@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutterproject_second/custom/BorderBox.dart';
 import 'package:flutterproject_second/utils/constants.dart';
-import 'package:flutterproject_second/utils/http.dart';
+import 'package:flutterproject_second/utils/httptest.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
 import 'package:flutterproject_second/screen/ModeScreen.dart';
@@ -177,7 +177,8 @@ class _httptestScreen extends State<httptestScreen> {
                             fit: BoxFit.cover,
                           );
                         });
-                        print((await HTTP_DATA)[0]['Time']);
+                        print(IMG_DATA[0]['place']);
+                        print((await HTTP_DATA)[0]['Name']);
                         print("getAllJson: $getaj");
                       },
                       child: Text("getalljson test"),

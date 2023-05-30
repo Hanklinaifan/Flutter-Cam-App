@@ -115,7 +115,7 @@ addVerticalSpace(10),
             Expanded(
               child: ListView.builder(
                 scrollDirection: Axis.vertical,
-                itemCount: MEMBER_DATA.length,
+                itemCount: TESTMEMBER_DATA.length,
                 itemBuilder: (context, index) {
                   return Item(
                     setmemberState: (){
@@ -123,7 +123,7 @@ addVerticalSpace(10),
 
                       });
                     },
-                    itemData: MEMBER_DATA[index],
+                    itemData: TESTMEMBER_DATA[index],
                     ontap: () {
                       //  setState(() {
                       //   for (int i = 0; i < MEMBER_DATA.length; i++) {
@@ -200,6 +200,7 @@ addVerticalSpace(10),
                           child: GestureDetector(
                             onTap: () {
                               pickImage(setState, ImageSource.gallery);
+                              print(image);
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -376,16 +377,13 @@ class _Item extends State<Item> {
             Positioned(
                     top: 20,
                     right: 50,
-                    child: ShowUp(
-                      delay: 5,
-                      child: GestureDetector(
-                        onTap: () {
-                          showEditDialog(context);
-                        },
-                        child: Icon(
-                          Icons.edit,
-                          color: Colors.brown,
-                        ),
+                    child: GestureDetector(
+                      onTap: () {
+                        showEditDialog(context);
+                      },
+                      child: Icon(
+                        Icons.edit,
+                        color: Colors.brown,
                       ),
                     ),
                   )
@@ -578,7 +576,7 @@ class _Item extends State<Item> {
               style: TextStyle(color: Colors.brown),
             ),
             onPressed: () {
-              MEMBER_DATA.removeAt(memberindex);
+              TESTMEMBER_DATA.removeAt(memberindex);
               widget.setmemberState;
               Navigator.pop(context);
               Navigator.pop(context);

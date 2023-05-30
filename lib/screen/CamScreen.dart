@@ -9,7 +9,7 @@ import 'package:flutterproject_second/screen/httptestScreen.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
-import 'package:flutterproject_second/utils/http.dart';
+import 'package:flutterproject_second/utils/httptest.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:flutterproject_second/screen/LandingScreen.dart';
@@ -120,13 +120,6 @@ class _CamScreen extends State<CamScreen> {
                       onTap:(){
                         setState(() {
                           _istouched = !_istouched;
-
-                          // if(_istouched){
-                          //   sleep(Duration(seconds: 2));
-                          //   setState(() {
-                          //     _istouched = false;
-                          //   });
-                          // }
                         });
                       },
                       child: Container(
@@ -179,14 +172,20 @@ class _CamScreen extends State<CamScreen> {
                               delay: 5,
                               child: Center(
                                   child: GestureDetector(
-                                    onTap:(){
+                                    onTap:() {
                                       setState(() {
                                         _vlccontroller!.value.isPlaying
                                             ? _vlccontroller!.pause()
                                             : _vlccontroller!.play();
                                         _isclick = !_isclick;
-
                                       });
+                                      Future.delayed(Duration(seconds: 3),
+                                          (){
+                                            setState(() {
+                                              _istouched = false;
+                                            });
+                                          }
+                                      );
                                     } ,
                                     child: Container(
                                       padding: EdgeInsets.symmetric(horizontal: 5,vertical: 5 ),

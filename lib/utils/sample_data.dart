@@ -1,6 +1,6 @@
-import 'package:flutterproject_second/utils/http.dart';
+import 'package:flutterproject_second/utils/httptest.dart';
 
-List<Map<String, dynamic>> MEMBER_DATA = [
+List<Map<String, dynamic>> TESTMEMBER_DATA = [
   {
     //資料庫資料，如圖片之類的
     "image":"assets/images/Theif.png",
@@ -145,7 +145,7 @@ List<Map<String, dynamic>> ROOM_DATA = [
 ];
 
 //getHTTPDATA
-Future<List<Map<String, dynamic>>> HTTP_DATA = getJson().then((value) => [value]);
+Future<dynamic> HTTP_DATA = getAllJson().then((value) => [value]);
 
 
 
