@@ -16,10 +16,12 @@ class _ModeScreen extends State<ModeScreen> {
   List<bool> _isElvated = [false, false, false, false];
   List<bool> _isElvated2 = [false, false, false, false];
   List<bool> _isMode = [false, false, false, false];
+
   @override
   Widget build(BuildContext context) {
     //mode的狀態歸0
-
+    dynamic modeinfo = ModalRoute.of(context)?.settings.arguments;
+    String roomname = modeinfo['room'];
     print(_isElvated);
 
     final Size mediasize = MediaQuery.of(context).size;
@@ -27,6 +29,7 @@ class _ModeScreen extends State<ModeScreen> {
     final double padding = 25;
     final sidePadding = EdgeInsets.symmetric(horizontal: padding);
     double ContainerHeight = mediasize.height / 2;
+
 
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -52,7 +55,7 @@ class _ModeScreen extends State<ModeScreen> {
                     ),
                   ),
                   addHorizontalSpace(10),
-                  Text("模式選擇", style: themeData.textTheme.displayMedium),
+                  Text("模式選擇：$roomname", style: themeData.textTheme.displayMedium),
                 ],
               ),
             ),

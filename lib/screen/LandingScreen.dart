@@ -328,7 +328,7 @@ class carouselView extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/ModeScreen',
-                    arguments: {'roomnum': itemData});
+                    arguments: {'roomnum': itemData,'room':itemData['room']});
               },
               child: Container(
                 width: 130,

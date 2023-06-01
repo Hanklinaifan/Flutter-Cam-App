@@ -53,7 +53,7 @@ class _AddCamScreen extends State<AddCamScreen> {
                 ),
                 addVerticalSpace(10),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   child: Column(
                     children: [
                       Container(
@@ -91,6 +91,7 @@ class _AddCamScreen extends State<AddCamScreen> {
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             TextField(
                                 decoration: InputDecoration(
@@ -99,8 +100,11 @@ class _AddCamScreen extends State<AddCamScreen> {
                             addVerticalSpace(padding),
                             TextField(
                                 decoration: InputDecoration(
-                                  labelText: "ID",
+                                  labelText: "URL",
                                 )),
+                            addVerticalSpace(5),
+                            Text("如何確認我的URL?",style: TextStyle(fontSize: 12,color: COLOR_LIGHTBROWN),)
+
 
                             //Text("Email：",style: themeData.textTheme.headline3,textAlign: TextAlign.start,)
                           ],
@@ -109,6 +113,19 @@ class _AddCamScreen extends State<AddCamScreen> {
                     ),
                   ),
                 ),
+                
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 25),
+                    width:500,
+                    height: 50,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.brown,
+                      ),
+                      onPressed: (){},
+                      child: Text("確認新增"),
+                    )
+                )
               ],
             ),
           ),

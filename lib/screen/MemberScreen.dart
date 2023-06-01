@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
 
@@ -10,6 +11,8 @@ import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../utils/MemberData.dart';
+
 class MemberScreen extends StatefulWidget {
   @override
   _MemberScreen createState() => _MemberScreen();
@@ -17,21 +20,49 @@ class MemberScreen extends StatefulWidget {
 
 class _MemberScreen extends State<MemberScreen> {
   @override
+  final textcontroll = TextEditingController();
+  final edit_textcontroll = TextEditingController();
+
+
+  @override
+  void dispose() {
+    textcontroll.dispose();
+    edit_textcontroll.dispose();
+    super.dispose();
+  }
 
   //手機相簿
+  String? imagepath;
   File? image;
   Future pickImage(Function setState, ImageSource source) async {
     try {
       final image = await ImagePicker().pickImage(source: source);
       if (image == null) return;
       final imageTemp = File(image.path);
-      setState(() => this.image = imageTemp);
+      setState(() {
+        this.image = imageTemp;
+        imagepath = image.path;
+      });
     } on PlatformException catch (e) {
       print("Failed because of $e");
     }
   }
 
-
+  File? faceimage;
+  Future pickfaceImage(Function setState, ImageSource source) async {
+    try {
+      final faceimage = await ImagePicker().pickImage(source: source);
+      if (faceimage == null) return;
+      final imageTemp = File(faceimage.path);
+      setState(() => this.faceimage = imageTemp);
+      var path = faceimage.path;
+      print(textcontroll.text + imagepath! + path);
+      await addMember(textcontroll.text, path, imagepath!);
+      Navigator.pop(context);
+    } on PlatformException catch (e) {
+      print("Failed because of $e");
+    }
+  }
 
   List<bool> isClick = [
     false,
@@ -56,10 +87,8 @@ class _MemberScreen extends State<MemberScreen> {
   bool isinput = false;
   @override
   Widget build(BuildContext context) {
-    setState(() {
 
-    });
-     print('pagebuild');
+    print(MEMBER_DATA);
 //個人檔案視窗大小
     final Size size = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
@@ -107,40 +136,62 @@ class _MemberScreen extends State<MemberScreen> {
               alignment: Alignment.centerRight,
               child: Padding(
                 padding: sidePadding,
-                child: GestureDetector(onTap: (){print('repair');setState(() {});},child:Text('重新整理',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.brown,fontSize: 14),)),
+                child: GestureDetector(
+                    onTap: () {
+                      print('repair');
+                      setState(() {});
+                    },
+                    child: Text(
+                      '重新整理',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.brown,
+                          fontSize: 14),
+                    )),
               ),
             ),
-addVerticalSpace(10),
+            addVerticalSpace(10),
 //家庭成員列表
             Expanded(
-              child: ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: TESTMEMBER_DATA.length,
-                itemBuilder: (context, index) {
-                  return Item(
-                    setmemberState: (){
-                      setState(() {
-
-                      });
-                    },
-                    itemData: TESTMEMBER_DATA[index],
-                    ontap: () {
-                      //  setState(() {
-                      //   for (int i = 0; i < MEMBER_DATA.length; i++) {
-                      //     if (i == index) {
-                      //       continue;
-                      //     } else {
-                      //       isClick[i] = false;
-                      //     }
-                      //   }
-                      //   isClick[index] = !isClick[index];
-                      // });
-                    },
-                    isclick: isClick[index],
-                    member_index: index,
+              child: FutureBuilder(
+                future: getAllMember(),
+                  builder: (context, AsyncSnapshot snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  List<Map<String, dynamic>> MEMBERDATA = snapshot.data;
+                  print(snapshot.data);
+                  return Container(
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: MEMBERDATA.length,
+                      itemBuilder: (context, index) {
+                        return Item(
+                          controller: edit_textcontroll,
+                          setmemberState: () {
+                            setState(() {});
+                          },
+                          itemData: MEMBERDATA[index],
+                          ontap: () {
+                            //  setState(() {
+                            //   for (int i = 0; i < MEMBER_DATA.length; i++) {
+                            //     if (i == index) {
+                            //       continue;
+                            //     } else {
+                            //       isClick[i] = false;
+                            //     }
+                            //   }
+                            //   isClick[index] = !isClick[index];
+                            // });
+                          },
+                          isclick: isClick[index],
+                          member_index: index,
+                        );
+                      },
+                    ),
                   );
-                },
-              ),
+                }
+              }),
             ),
           ],
         ),
@@ -152,12 +203,13 @@ addVerticalSpace(10),
   showAddDialog(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     bool _isinput = false;
-    ImageProvider addmemimage ;
+    ImageProvider addmemimage;
 
-    if(image != null){
+    if (image != null) {
       addmemimage = FileImage(image!);
+    } else {
+      addmemimage = AssetImage("assets/images/01.jpg") as ImageProvider;
     }
-    else{addmemimage = AssetImage("assets/images/01.jpg") as ImageProvider;}
     print(_isinput);
     // Init
     AlertDialog dialog = AlertDialog(
@@ -220,14 +272,15 @@ addVerticalSpace(10),
                 ),
                 addVerticalSpace(8),
                 TextField(
+                    controller: textcontroll,
                     onTap: () {
-                     setState((){
+                      setState(() {
                         _isinput = true;
                       });
                     },
                     onEditingComplete: () {
-                      print("complete");
-                      setState((){
+                      print(textcontroll.text);
+                      setState(() {
                         _isinput = false;
                         FocusScope.of(context).unfocus();
                       });
@@ -258,9 +311,9 @@ addVerticalSpace(10),
                 ),
                 onPressed: () {
                   // Navigator.pop(context);
-                  pickImage(setState, ImageSource.camera);
+                  pickfaceImage(setState, ImageSource.camera);
                   setState(() {
-                    this.image = File(image!.path);
+                    this.faceimage = File(faceimage!.path);
                   });
                 }),
         _isinput
@@ -302,28 +355,32 @@ class Item extends StatefulWidget {
   final member_index;
   final bool isclick;
   final VoidCallback setmemberState;
+  final TextEditingController controller;
 
   final VoidCallback ontap;
   const Item(
       {Key? key,
-        required this.setmemberState,
+      required this.setmemberState,
       required this.itemData,
       required this.ontap,
       required this.member_index,
-      required this.isclick})
+      required this.isclick, required this.controller})
       : super(key: key);
   @override
   _Item createState() => _Item();
 }
 
 class _Item extends State<Item> {
+
   @override
   Widget build(BuildContext context) {
     print('itembuild');
     int memberindex = widget.member_index + 1;
-
+    var edit_textcontroll = widget.controller;
     final sidePadding = EdgeInsets.symmetric(horizontal: 25);
     final ThemeData themeData = Theme.of(context);
+
+
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 20),
@@ -340,7 +397,9 @@ class _Item extends State<Item> {
                     height: 300,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(color: COLOR_GREY,),
+                      border: Border.all(
+                        color: COLOR_GREY,
+                      ),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Stack(
@@ -355,8 +414,8 @@ class _Item extends State<Item> {
                             height: 210,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(360.0),
-                              child: Image.asset(
-                                widget.itemData["image"],
+                              child: Image.memory(
+                                base64Decode(widget.itemData["avatar"]),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -375,18 +434,18 @@ class _Item extends State<Item> {
               ),
             ),
             Positioned(
-                    top: 20,
-                    right: 50,
-                    child: GestureDetector(
-                      onTap: () {
-                        showEditDialog(context);
-                      },
-                      child: Icon(
-                        Icons.edit,
-                        color: Colors.brown,
-                      ),
-                    ),
-                  )
+              top: 20,
+              right: 50,
+              child: GestureDetector(
+                onTap: () {
+                  showEditDialog(context,edit_textcontroll);
+                },
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.brown,
+                ),
+              ),
+            )
           ]),
         ],
       ),
@@ -405,7 +464,21 @@ class _Item extends State<Item> {
     }
   }
 
-  showEditDialog(BuildContext context) {
+  File? faceimage;
+  Future pickfaceImage(Function setState, ImageSource source) async {
+    try {
+      final faceimage = await ImagePicker().pickImage(source: source);
+      if (faceimage == null) return;
+      final imageTemp = File(faceimage.path);
+      setState(() => this.faceimage = imageTemp);
+    } on PlatformException catch (e) {
+      print("Failed because of $e");
+    }
+  }
+
+  showEditDialog(BuildContext context,TextEditingController textcontroller) {
+
+
     setState(() {
       image = null;
     });
@@ -418,8 +491,8 @@ class _Item extends State<Item> {
         builder: (context, setState) {
           return Container(
             height: 250,
-            child: Stack(
-              children: [Column(
+            child: Stack(children: [
+              Column(
                 children: [
                   Container(
                     height: 150,
@@ -428,18 +501,18 @@ class _Item extends State<Item> {
                       addVerticalSpace(10),
                       Center(
                           child: Ink.image(
-                            fit: BoxFit.cover,
-                            width: 150,
-                            image: image != null
-                                ? FileImage(image!)
-                                : AssetImage(widget.itemData["image"])
-                            as ImageProvider,
-                            child: InkWell(
-                              onTap: () {
-                                pickImage(setState, ImageSource.gallery);
-                              },
-                            ),
-                          )),
+                        fit: BoxFit.cover,
+                        width: 150,
+                        image: image != null
+                            ? FileImage(image!)
+                            : MemoryImage(base64Decode(widget.itemData["avatar"]))
+                                as ImageProvider,
+                        child: InkWell(
+                          onTap: () {
+                            pickImage(setState, ImageSource.gallery);
+                          },
+                        ),
+                      )),
                       Positioned(
                           bottom: 5,
                           left: 100,
@@ -447,7 +520,8 @@ class _Item extends State<Item> {
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.9),
                                 borderRadius: BorderRadius.circular(60),
-                                border: Border.all(color: Colors.grey, width: 1)),
+                                border:
+                                    Border.all(color: Colors.grey, width: 1)),
                             height: 35,
                             width: 70,
                             child: GestureDetector(
@@ -472,7 +546,7 @@ class _Item extends State<Item> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      pickImage(setState, ImageSource.camera);
+                      pickfaceImage(setState, ImageSource.camera);
                       setState(() {
                         this.image = File(image!.path);
                       });
@@ -484,14 +558,14 @@ class _Item extends State<Item> {
                   ),
                   addVerticalSpace(8),
                   TextFormField(
-                      initialValue: widget.itemData["name"],
+                    controller: textcontroller,
+                      //initialValue: widget.itemData["name"],
                       decoration: InputDecoration(
                         labelText: "Name",
                       )),
                 ],
               ),
-              ]
-            ),
+            ]),
           );
         },
       ),
@@ -508,7 +582,10 @@ class _Item extends State<Item> {
           GestureDetector(
             onTap: () {
               //  刪除成員
-          showDialog(context,widget.member_index,);
+              showDialog(
+                context,
+                widget.member_index,
+              );
             },
             child: Text(
               "刪除成員",
@@ -521,17 +598,30 @@ class _Item extends State<Item> {
         ],
       ),
       actions: [
-        (MediaQuery.of(context).viewInsets.bottom > 0)?
-        SizedBox.shrink():
-        MaterialButton(
-            color: Color.fromRGBO(192, 176, 162, 1),
-            child: Text(
-              "儲存",
-              style: TextStyle(color: Colors.brown),
-            ),
-            onPressed: () {
-              // Navigator.pop(context);
-            }),
+        (MediaQuery.of(context).viewInsets.bottom > 0)
+            ? SizedBox.shrink()
+            : MaterialButton(
+                color: Color.fromRGBO(192, 176, 162, 1),
+                child: Text(
+                  "儲存",
+                  style: TextStyle(color: Colors.brown),
+                ),
+                onPressed: () {
+                  var avaimg;
+                  var faceimg;
+                  if(image == null){
+                    avaimg = widget.itemData["avatar"];
+                  }
+                  else{avaimg = image!.path;}
+                  //
+                  if(faceimage == null){
+                    faceimg = widget.itemData["image"];
+                  }
+                  else{faceimg = faceimage!.path;}
+
+                  editMember(widget.itemData["name"], textcontroller.text, faceimg, avaimg);
+                  // Navigator.pop(context);
+                }),
         MaterialButton(
             color: Color.fromRGBO(192, 176, 162, 1),
             child: Text(
@@ -561,13 +651,12 @@ class _Item extends State<Item> {
       transitionDuration: Duration(milliseconds: 300),
     );
   }
-  showDialog(BuildContext context,int memberindex) {
+
+  showDialog(BuildContext context, int memberindex) {
     final ThemeData themeData = Theme.of(context);
     // Init
     AlertDialog dialog = AlertDialog(
-      content: Text(
-          "確定要刪除此成員?"
-      ),
+      content: Text("確定要刪除此成員?"),
       actions: [
         MaterialButton(
             color: Color.fromRGBO(192, 176, 162, 1),
@@ -576,11 +665,11 @@ class _Item extends State<Item> {
               style: TextStyle(color: Colors.brown),
             ),
             onPressed: () {
-              TESTMEMBER_DATA.removeAt(memberindex);
-              widget.setmemberState;
+              DeleteMember(widget.itemData["name"]);
+              // TESTMEMBER_DATA.removeAt(memberindex);
+              // widget.setmemberState;
               Navigator.pop(context);
               Navigator.pop(context);
-
             }),
         MaterialButton(
             color: Color.fromRGBO(192, 176, 162, 1),

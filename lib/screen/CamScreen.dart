@@ -25,7 +25,8 @@ class _CamScreen extends State<CamScreen> {
   bool _isclick = true ;
   bool _istouched = true;
 
-  String videosource = "rtsp://Hank_MA303:ZH_MA303@192.168.0.170/stream1";
+  String url = "172.20.10.10";
+  String videosource = "rtsp://Hank_MA303:ZH_MA303@172.20.10.10/stream1";
   String tsetvideosource = "rtsp://211.21.74.23:8554/stream1";
   VlcPlayerController? _vlccontroller;
 
@@ -358,7 +359,9 @@ class _CamScreen extends State<CamScreen> {
                           width: mediasize.width,
                           child: OutlinedButton(
                             onPressed: () {
-                              print("picjson: $http_get_picnjson");
+                              Navigator.pushNamed(context, '/ModeScreen',
+                                arguments: {"room":roomname}
+                              );
                             },
                             child: Text("切換模式"),
                           )),
