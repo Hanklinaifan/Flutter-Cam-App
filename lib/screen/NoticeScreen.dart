@@ -67,14 +67,22 @@ class _NoticeScreen extends State<NoticeScreen> {
                         if(snapshot.data == null){
                           return Center(child: Text('尚無通知'),);
                         }
-                        return  ListView.builder(
-                          itemCount: snapshot.data.length,
-                          scrollDirection: Axis.vertical,
-                          itemBuilder: (context, index) {
-                            return NoticeItem(index: index,
-                              SUSDATA: snapshot.data[index],);
-                          },
-                        );
+                        else{
+                          var data = snapshot.data;
+                          data.sort((a,b){
+                            var adate = a['appear_time'].toString();
+                            var bdate = b['appear_time'].toString();
+                            return bdate.compareTo(adate);
+                          });
+                          return  ListView.builder(
+                            itemCount: data.length,
+                            scrollDirection: Axis.vertical,
+                            itemBuilder: (context, index) {
+                              return NoticeItem(index: index,
+                                SUSDATA: data[index],);
+                            },
+                          );
+                        }
                       }
                       else{
                         return Center(child: CircularProgressIndicator());

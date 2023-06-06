@@ -44,6 +44,34 @@ Future<void> addCam(String name,String url) async {
 
 }
 
+
+Future<void> ChangeCamMode(String name,String mode) async {
+
+
+  Map<String,dynamic> mdata = {
+    "name" : name,
+    "mode" : mode,
+  };
+  final encode_mdata = json.encode(mdata);
+  final encoding = Encoding.getByName('utf-8');
+  print(encode_mdata);
+
+  http.Response response = await http.post(Uri.parse(http_changeCamMode),
+    headers: {
+      //need to set headers ex :
+      // "Accept": "application/json",
+      // "Content-Type": "application/x-www-form-urlencoded"
+      "Content-Type": "application/json"
+    },
+    body: encode_mdata,
+    encoding: encoding,
+  );
+
+  var res = json.decode(response.body);
+  print(res);
+
+}
+
 Future<void> DeleteCam(String name) async {
   http.Response response = await http.delete(Uri.parse(http_deleteCam+"/$name"),);
   //接收回傳

@@ -26,8 +26,9 @@ class _CamScreen extends State<CamScreen> {
   bool _istouched = true;
 
   String url = "172.20.10.10";
-  String videosource = "rtsp://Hank_MA303:ZH_MA303@172.20.10.10/stream1";
-  //String videosource = "rtsp://211.21.74.23:8554/stream/webcam";
+  //String videosource = "rtsp://Hank_MA303:ZH_MA303@172.20.10.10/stream1";
+  //String videosource = "rtsp://211.21.74.23:8554/stream/TEST";
+  String videosource = "rtsp://211.21.74.23:8554/stream/TEST";
   String tsetvideosource = "rtsp://211.21.74.23:8554/stream1";
   VlcPlayerController? _vlccontroller;
 
@@ -61,12 +62,21 @@ class _CamScreen extends State<CamScreen> {
   }
 
   Widget build(BuildContext context) {
+
+
+
     final Size mediasize = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
     dynamic roominfo = ModalRoute.of(context)?.settings.arguments;
     var roomindex = roominfo['index'];
     String? roomname = roominfo['name'];
+    var roommode = roominfo['mode'];
 
+    setState(() {
+      videosource = "rtsp://211.21.74.23:8554/stream/$roomname";
+    });
+
+    print("video is $videosource");
 
 
     return Scaffold(
@@ -361,7 +371,7 @@ class _CamScreen extends State<CamScreen> {
                           child: OutlinedButton(
                             onPressed: () {
                               Navigator.pushNamed(context, '/ModeScreen',
-                                arguments: {"room":roomname}
+                                arguments: {"room":roomname,'mode':roommode}
                               );
                             },
                             child: Text("切換模式",style: TextStyle(color: Colors.brown),),

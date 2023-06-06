@@ -51,6 +51,11 @@ class AllsusScreen extends StatelessWidget {
                 } else {
                   var SUS_DATA = snapshot.data;
                   //print(getSusPic(SUS_DATA[0]["videopath"]));
+                  SUS_DATA.sort((a,b){
+                    var adate = a['appear_time'].toString();
+                    var bdate = b['appear_time'].toString();
+                    return bdate.compareTo(adate);
+                  });
                   if(SUS_DATA == null){
                     return Center(child: Text('尚無可疑人士'));
                   }

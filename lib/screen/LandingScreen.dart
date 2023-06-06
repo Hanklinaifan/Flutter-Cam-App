@@ -188,7 +188,13 @@ class _LandingScreen extends State<LandingScreen> {
                         if(snapshot.data == null){
                           return Padding(padding: sidePadding,child: Text('目前無可疑人士'));
                         }
-                        else {return  ListView.builder(
+                        else {
+                          snapshot.data.sort((a,b){
+                            var adate = a['appear_time'].toString();
+                            var bdate = b['appear_time'].toString();
+                            return bdate.compareTo(adate);
+                          });
+                          return  ListView.builder(
                           scrollDirection: Axis.horizontal,
                           itemCount: snapshot.data.length,
                           itemBuilder: (context, index) {
@@ -228,6 +234,21 @@ class carouselView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    var mode ;
+    if(itemData['mode']=='normal'){
+      mode = '一般模式';
+    }
+    else if(itemData['mode']=='outdoor'){
+      mode = '室外模式';
+    }
+    else if(itemData['mode']=='room'){
+      mode = '室內模式';
+    }
+    else{
+      mode = '夜沒歸模式';
+    }
+
     final Size mediasize = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
     final plusone = roomindex+1;
@@ -240,7 +261,7 @@ class carouselView extends StatelessWidget {
             onTap: () {
               Navigator.pushNamed(
                   context, "/CamScreen",
-                arguments: {'index':roomindex,'name':itemData['name']}
+                arguments: {'index':roomindex,'name':itemData['name'],'mode':itemData["mode"]}
               );
             },
             child: Container(
@@ -286,7 +307,7 @@ class carouselView extends StatelessWidget {
             child: GestureDetector(
               onTap: () {
                 Navigator.pushNamed(context, '/ModeScreen',
-                    arguments: {'roomnum': itemData,'room':itemData['name']});
+                    arguments: {'roomnum': itemData,'room':itemData['name'],'mode':itemData['mode']});
               },
               child: Container(
                 width: 130,
@@ -299,7 +320,7 @@ class carouselView extends StatelessWidget {
                 ),
                 child: Center(
                     child: Text(
-                  "一般模式",
+                 mode,
                   style: themeData.textTheme.headline5,
                 )),
               ),

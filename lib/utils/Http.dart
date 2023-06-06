@@ -45,3 +45,6 @@ final String http_getCam = comurl+"/server/camera/info";
 final String http_addCam = localurl+"/camera/add";
 //刪除CAM
 final String http_deleteCam = localurl+"/camera/delete";
+
+//取得CAM
+final String http_changeCamMode = comurl+"/server/camera/setmode";

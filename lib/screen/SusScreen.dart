@@ -138,6 +138,11 @@ class _SusScreen extends State<SusScreen> {
 
                 if(snapshot.connectionState == ConnectionState.done){
                   var data = snapshot.data;
+                  data.sort((a,b){
+                    var adate = a['appear_time'].toString();
+                    var bdate = b['appear_time'].toString();
+                    return bdate.compareTo(adate);
+                  });
                   return ListView.builder(
                         scrollDirection: Axis.horizontal,
                         itemCount: snapshot.data.length,

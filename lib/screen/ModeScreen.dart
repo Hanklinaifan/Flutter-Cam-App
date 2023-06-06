@@ -18,12 +18,31 @@ class _ModeScreen extends State<ModeScreen> {
   List<bool> _isElvated2 = [false, false, false, false, false];
   List<bool> _isMode = [false, false, false, false, false];
 
+
+
+
   @override
   Widget build(BuildContext context) {
     //mode的狀態歸0
     dynamic modeinfo = ModalRoute.of(context)?.settings.arguments;
     String roomname = modeinfo['room'];
-    print(_isElvated);
+    print(modeinfo['mode']);
+    var mode = modeinfo['mode'];
+    setState(() {
+      if(mode == 'normal'){
+        _isMode[0] = true;
+      }
+      else if(mode == 'room'){
+        _isMode[1] = true;
+      }
+      else if(mode == 'outdoor'){
+        _isMode[2] = true;
+      }
+      else{
+        _isMode[3] = true;
+      }
+    });
+    print(_isMode);
 
     final Size mediasize = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
@@ -94,7 +113,7 @@ class _ModeScreen extends State<ModeScreen> {
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 25),
-                child: ListView(
+                child:  ListView(
                   children: <Widget>[
                     ModeBotton(
                       text: "一般模式",
@@ -103,7 +122,7 @@ class _ModeScreen extends State<ModeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("一般的攝影機，無須設定成員，無臉部\n辨識系統",style: TextStyle(
-                            color: Colors.brown.withOpacity(.6)
+                              color: Colors.brown.withOpacity(.6)
                           ),),
                           addVerticalSpace(10),
                           Text("功能："),
@@ -142,6 +161,7 @@ class _ModeScreen extends State<ModeScreen> {
                         ],
                       ),
                       ontap: () {
+
                         this.setState(() {
                           for (int i = 0; i < _isElvated.length; i++) {
                             if (i == 0) {
@@ -153,15 +173,18 @@ class _ModeScreen extends State<ModeScreen> {
                           }
                         });
                         _isElvated[0] = !_isElvated[0];
+
+
                         Future.delayed(
                             Duration(milliseconds: _isElvated[0] ? 250 : 0),
-                            () {
-                          this.setState(() {
-                            _isElvated2[0] = _isElvated[0];
-                          });
-                        });
+                                () {
+                              this.setState(() {
+                                _isElvated2[0] = _isElvated[0];
+                              });
+                            });
                       },
                       modeontap: () {
+                        modeinfo['mode'] = 'normal';
                         this.setState(() {
                           for (int i = 0; i < _isMode.length; i++) {
                             if (i == 0) {
@@ -172,6 +195,8 @@ class _ModeScreen extends State<ModeScreen> {
                           }
                           _isMode[0] = !_isMode[0];
                         });
+                        ChangeCamMode(roomname, 'normal');
+
                         print("ismode: $_isMode");
                       },
                       isclick: _isElvated[0],
@@ -224,6 +249,7 @@ class _ModeScreen extends State<ModeScreen> {
                         ],
                       ),
                       ontap: () {
+
                         this.setState(() {
                           for (int i = 0; i < _isElvated.length; i++) {
                             if (i == 1) {
@@ -234,16 +260,18 @@ class _ModeScreen extends State<ModeScreen> {
                             }
                           }
                         });
+
                         _isElvated[1] = !_isElvated[1];
                         Future.delayed(
                             Duration(milliseconds: _isElvated[1] ? 250 : 0),
                                 () {
                               this.setState(() {
-                                 _isElvated2[1] = _isElvated[1];
+                                _isElvated2[1] = _isElvated[1];
                               });
                             });
                       },
                       modeontap: () {
+                        modeinfo['mode'] = 'room';
                         this.setState(() {
                           for (int i = 0; i < _isMode.length; i++) {
                             if (i == 1) {
@@ -254,6 +282,7 @@ class _ModeScreen extends State<ModeScreen> {
                           }
                           _isMode[1] = !_isMode[1];
                         });
+                        ChangeCamMode(roomname, 'room');
                         print("ismode: $_isMode");
                       },
                       isclick: _isElvated[1],
@@ -316,6 +345,7 @@ class _ModeScreen extends State<ModeScreen> {
                               }
                             }
                           });
+
                           _isElvated[2] = !_isElvated[2];
                           Future.delayed(
                               Duration(milliseconds: _isElvated[2] ? 250 : 0),
@@ -326,6 +356,7 @@ class _ModeScreen extends State<ModeScreen> {
                               });
                         },
                         modeontap: () {
+                          modeinfo['mode'] = 'outdoor';
                           this.setState(() {
                             for (int i = 0; i < _isMode.length; i++) {
                               if (i == 2) {
@@ -336,6 +367,7 @@ class _ModeScreen extends State<ModeScreen> {
                             }
                             _isMode[2] = !_isMode[2];
                           });
+                          ChangeCamMode(roomname, 'outdoor');
                           print("ismode: $_isMode");
                         },
                         isclick: _isElvated[2],
@@ -397,6 +429,7 @@ class _ModeScreen extends State<ModeScreen> {
                             }
                           }
                         });
+
                         _isElvated[3] = !_isElvated[3];
                         Future.delayed(
                             Duration(milliseconds: _isElvated[3] ? 250 : 0),
@@ -407,6 +440,7 @@ class _ModeScreen extends State<ModeScreen> {
                             });
                       },
                       modeontap: () {
+                        modeinfo['mode'] = 'room_outside';
                         this.setState(() {
                           for (int i = 0; i < _isMode.length; i++) {
                             if (i == 3) {
@@ -417,6 +451,7 @@ class _ModeScreen extends State<ModeScreen> {
                           }
                           _isMode[3] = !_isMode[3];
                         });
+                        ChangeCamMode(roomname, 'room_outside');
                         print("ismode: $_isMode");
                       },
                       isclick: _isElvated[3],
@@ -425,6 +460,7 @@ class _ModeScreen extends State<ModeScreen> {
                     ),
                   ],
                 ),
+                //
               ),
             ),
           ],
