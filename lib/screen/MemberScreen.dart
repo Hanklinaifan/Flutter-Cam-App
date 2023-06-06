@@ -20,7 +20,7 @@ class MemberScreen extends StatefulWidget {
 
 class _MemberScreen extends State<MemberScreen> {
   @override
-  final textcontroll = TextEditingController();
+  late TextEditingController textcontroll = TextEditingController();
   final edit_textcontroll = TextEditingController();
 
 
@@ -48,6 +48,7 @@ class _MemberScreen extends State<MemberScreen> {
     }
   }
 
+  //bool trigger = false;
   File? faceimage;
   Future pickfaceImage(Function setState, ImageSource source) async {
     try {
@@ -56,8 +57,8 @@ class _MemberScreen extends State<MemberScreen> {
       final imageTemp = File(faceimage.path);
       setState(() => this.faceimage = imageTemp);
       var path = faceimage.path;
-      print(textcontroll.text + imagepath! + path);
-      await addMember(textcontroll.text, path, imagepath!);
+      //print(textcontroll.text + imagepath! + path);
+      addMember(textcontroll.text, path, imagepath!);
       Navigator.pop(context);
     } on PlatformException catch (e) {
       print("Failed because of $e");
@@ -88,7 +89,7 @@ class _MemberScreen extends State<MemberScreen> {
   @override
   Widget build(BuildContext context) {
 
-    print(MEMBER_DATA);
+    //print(MEMBER_DATA);
 //個人檔案視窗大小
     final Size size = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
@@ -156,40 +157,44 @@ class _MemberScreen extends State<MemberScreen> {
               child: FutureBuilder(
                 future: getAllMember(),
                   builder: (context, AsyncSnapshot snapshot) {
-                if (!snapshot.hasData) {
+                if (snapshot.connectionState != ConnectionState.done) {
                   return Center(child: CircularProgressIndicator());
                 } else {
-                  List<Map<String, dynamic>> MEMBERDATA = snapshot.data;
-                  print(snapshot.data);
-                  return Container(
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: MEMBERDATA.length,
-                      itemBuilder: (context, index) {
-                        return Item(
-                          controller: edit_textcontroll,
-                          setmemberState: () {
-                            setState(() {});
-                          },
-                          itemData: MEMBERDATA[index],
-                          ontap: () {
-                            //  setState(() {
-                            //   for (int i = 0; i < MEMBER_DATA.length; i++) {
-                            //     if (i == index) {
-                            //       continue;
-                            //     } else {
-                            //       isClick[i] = false;
-                            //     }
-                            //   }
-                            //   isClick[index] = !isClick[index];
-                            // });
-                          },
-                          isclick: isClick[index],
-                          member_index: index,
-                        );
-                      },
-                    ),
-                  );
+                  //print(snapshot.data);
+                  if(snapshot.data == null){
+                    return Center(child: Text('尚未新增成員'),);
+                  }
+                  else{
+                    return Container(
+                      child: ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, index) {
+                          return Item(
+                            controller: edit_textcontroll,
+                            setmemberState: () {
+                              setState(() {});
+                            },
+                            itemData: snapshot.data[index],
+                            ontap: () {
+                              //  setState(() {
+                              //   for (int i = 0; i < MEMBER_DATA.length; i++) {
+                              //     if (i == index) {
+                              //       continue;
+                              //     } else {
+                              //       isClick[i] = false;
+                              //     }
+                              //   }
+                              //   isClick[index] = !isClick[index];
+                              // });
+                            },
+                            isclick: isClick[index],
+                            member_index: index,
+                          );
+                        },
+                      ),
+                    );
+                  }
                 }
               }),
             ),
@@ -204,13 +209,14 @@ class _MemberScreen extends State<MemberScreen> {
     final ThemeData themeData = Theme.of(context);
     bool _isinput = false;
     ImageProvider addmemimage;
+    textcontroll = TextEditingController();
 
     if (image != null) {
       addmemimage = FileImage(image!);
     } else {
       addmemimage = AssetImage("assets/images/01.jpg") as ImageProvider;
     }
-    print(_isinput);
+    //print(_isinput);
     // Init
     AlertDialog dialog = AlertDialog(
       scrollable: true,
@@ -252,7 +258,7 @@ class _MemberScreen extends State<MemberScreen> {
                           child: GestureDetector(
                             onTap: () {
                               pickImage(setState, ImageSource.gallery);
-                              print(image);
+                              //print(image);
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -279,7 +285,7 @@ class _MemberScreen extends State<MemberScreen> {
                       });
                     },
                     onEditingComplete: () {
-                      print(textcontroll.text);
+                      //print(textcontroll.text);
                       setState(() {
                         _isinput = false;
                         FocusScope.of(context).unfocus();
@@ -311,7 +317,7 @@ class _MemberScreen extends State<MemberScreen> {
                 ),
                 onPressed: () {
                   // Navigator.pop(context);
-                  pickfaceImage(setState, ImageSource.camera);
+                  pickfaceImage(setState, ImageSource.gallery);
                   setState(() {
                     this.faceimage = File(faceimage!.path);
                   });
@@ -546,7 +552,7 @@ class _Item extends State<Item> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      pickfaceImage(setState, ImageSource.camera);
+                      pickfaceImage(setState, ImageSource.gallery);
                       setState(() {
                         this.image = File(image!.path);
                       });
@@ -620,7 +626,7 @@ class _Item extends State<Item> {
                   else{faceimg = faceimage!.path;}
 
                   editMember(widget.itemData["name"], textcontroller.text, faceimg, avaimg);
-                  // Navigator.pop(context);
+                  Navigator.pop(context);
                 }),
         MaterialButton(
             color: Color.fromRGBO(192, 176, 162, 1),

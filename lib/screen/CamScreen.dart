@@ -27,6 +27,7 @@ class _CamScreen extends State<CamScreen> {
 
   String url = "172.20.10.10";
   String videosource = "rtsp://Hank_MA303:ZH_MA303@172.20.10.10/stream1";
+  //String videosource = "rtsp://211.21.74.23:8554/stream/webcam";
   String tsetvideosource = "rtsp://211.21.74.23:8554/stream1";
   VlcPlayerController? _vlccontroller;
 
@@ -60,12 +61,11 @@ class _CamScreen extends State<CamScreen> {
   }
 
   Widget build(BuildContext context) {
-
     final Size mediasize = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
     dynamic roominfo = ModalRoute.of(context)?.settings.arguments;
     var roomindex = roominfo['index'];
-    String? roomname = ROOM_DATA[roomindex]['room'];
+    String? roomname = roominfo['name'];
 
 
 
@@ -77,7 +77,7 @@ class _CamScreen extends State<CamScreen> {
           child: ListView(
             //crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              addVerticalSpace(padding-20),
+              addVerticalSpace(padding-15),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
@@ -98,7 +98,7 @@ class _CamScreen extends State<CamScreen> {
                   ],
                 ),
               ),
-              addVerticalSpace(10),
+              addVerticalSpace(5),
 
               //選擇監視器
 
@@ -239,7 +239,26 @@ class _CamScreen extends State<CamScreen> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+
                         children: [
+                          GestureDetector(
+                          onTap: () async {
+                            _vlccontroller!.stop();
+                            //dispose();
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(vertical: 5),
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: COLOR_GREY),
+                              borderRadius: BorderRadius.circular(90),
+                            ),
+                            child: Center(
+                              child: Icon(Icons.stop),
+                            ),
+                          ),
+                        ),
                           GestureDetector(
                             onTap: () {
                               _vlccontroller!.value.isPlaying
@@ -250,7 +269,7 @@ class _CamScreen extends State<CamScreen> {
                               });
                             },
                             child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 5),
+                              margin: EdgeInsets.symmetric(vertical: 5,horizontal: 10),
                               width: 50,
                               height: 50,
                               decoration: BoxDecoration(
@@ -260,24 +279,6 @@ class _CamScreen extends State<CamScreen> {
                               child: Center(
                                 child: Icon(
                                     _isclick ? Icons.play_arrow : Icons.pause),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              _vlccontroller!.stop();
-                              //dispose();
-                            },
-                            child: Container(
-                              margin: EdgeInsets.symmetric(vertical: 5),
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                border: Border.all(color: COLOR_GREY),
-                                borderRadius: BorderRadius.circular(90),
-                              ),
-                              child: Center(
-                                child: Icon(Icons.stop),
                               ),
                             ),
                           ),
@@ -317,13 +318,13 @@ class _CamScreen extends State<CamScreen> {
                 child: Container(
                   height: 280,
                   decoration: BoxDecoration(
-                    border: Border.all(color: COLOR_GREY),
+                    //border: Border.all(color: COLOR_GREY),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: ListView(
-                    padding: sidePadding,
+                    //padding: sidePadding,
                     children: [
-                      addVerticalSpace(padding),
+                      addVerticalSpace(padding-5),
                       Container(
                           height: 60,
                           width: mediasize.width,
@@ -331,7 +332,7 @@ class _CamScreen extends State<CamScreen> {
                             onPressed: () {
                               print("getpic: $http_get_pic");
                             },
-                            child: Text("更換攝影機名稱"),
+                            child: Text("更換攝影機名稱",style: TextStyle(color: Colors.brown),),
                           )),
                       addVerticalSpace(padding),
                       Container(
@@ -351,7 +352,7 @@ class _CamScreen extends State<CamScreen> {
                                   MaterialPageRoute(
                                       builder: (context) => httptestScreen()));
                             },
-                            child: Text("查看紀錄"),
+                            child: Text("測試頁面",style: TextStyle(color: Colors.brown),),
                           )),
                       addVerticalSpace(padding),
                       Container(
@@ -363,7 +364,7 @@ class _CamScreen extends State<CamScreen> {
                                 arguments: {"room":roomname}
                               );
                             },
-                            child: Text("切換模式"),
+                            child: Text("切換模式",style: TextStyle(color: Colors.brown),),
                           )),
                       addVerticalSpace(padding),
                       Container(
@@ -373,7 +374,7 @@ class _CamScreen extends State<CamScreen> {
                             onPressed: () {
                               print("picjson: $http_get_picnjson");
                             },
-                            child: Text("刪除攝影機"),
+                            child: Text("刪除攝影機",style: TextStyle(color: Colors.redAccent),),
                           )),
                       addVerticalSpace(padding),
                     ],

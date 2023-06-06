@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterproject_second/custom/BorderBox.dart';
 import 'package:flutterproject_second/custom/MyButton.dart';
 import 'package:flutterproject_second/screen/LandingScreen.dart';
+import 'package:flutterproject_second/utils/CamData.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
@@ -13,9 +14,9 @@ class ModeScreen extends StatefulWidget {
 }
 
 class _ModeScreen extends State<ModeScreen> {
-  List<bool> _isElvated = [false, false, false, false];
-  List<bool> _isElvated2 = [false, false, false, false];
-  List<bool> _isMode = [false, false, false, false];
+  List<bool> _isElvated = [false, false, false, false,false];
+  List<bool> _isElvated2 = [false, false, false, false, false];
+  List<bool> _isMode = [false, false, false, false, false];
 
   @override
   Widget build(BuildContext context) {
@@ -64,13 +65,21 @@ class _ModeScreen extends State<ModeScreen> {
             addVerticalSpace(padding),
             Container(
               height: 50,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: ROOM_DATA.length,
-                itemBuilder: (context, index) {
-                  return Choiseroom(itemdata: ROOM_DATA[index]);
+              child: FutureBuilder(
+                future: getAllCam(),
+                builder: (context,AsyncSnapshot snapshot){
+                  if(snapshot.connectionState == ConnectionState.done){
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        return Choiseroom(itemdata: snapshot.data[index]);
+                      },
+                    );
+                  }
+                  else{return Center(child: CircularProgressIndicator(),);}
                 },
-              ),
+              )
             ),
 
             Padding(
@@ -332,6 +341,88 @@ class _ModeScreen extends State<ModeScreen> {
                         isclick: _isElvated[2],
                         isclick2: _isElvated2[2],
                         ismode: _isMode[2]),
+                    ModeBotton(
+                      text: "夜沒歸模式",
+                      img: "assets/images/nightmare_mode.jpg",
+                      widget: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("當家中人員皆外出時可啟動此模式，此\n模式會偵測畫面內任何移動物，擷取畫\n面並通知使用者。",style: TextStyle(
+                              color: Colors.brown.withOpacity(.6)
+                          ),),
+                          addVerticalSpace(8),
+                          Text("功能："),
+                          addVerticalSpace(10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                color: COLOR_GREEN,
+                                size: 20,
+                              ),
+                              addHorizontalSpace(2),
+                              Text(
+                                "可疑人士通知",
+                                style: TextStyle(color: COLOR_GREEN),
+                              ),
+                            ],
+                          ),
+                          addVerticalSpace(5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.check_circle,
+                                color: COLOR_GREEN,
+                                size: 20,
+                              ),
+                              addHorizontalSpace(2),
+                              Text(
+                                "移動物偵測",
+                                style: TextStyle(color: COLOR_GREEN),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      ontap: () {
+                        this.setState(() {
+                          for (int i = 0; i < _isElvated.length; i++) {
+                            if (i == 3) {
+                              continue;
+                            } else {
+                              _isElvated[i] = false;
+                              _isElvated2[i] = false;
+                            }
+                          }
+                        });
+                        _isElvated[3] = !_isElvated[3];
+                        Future.delayed(
+                            Duration(milliseconds: _isElvated[3] ? 250 : 0),
+                                () {
+                              this.setState(() {
+                                _isElvated2[3] = _isElvated[3];
+                              });
+                            });
+                      },
+                      modeontap: () {
+                        this.setState(() {
+                          for (int i = 0; i < _isMode.length; i++) {
+                            if (i == 3) {
+                              continue;
+                            } else {
+                              _isMode[i] = false;
+                            }
+                          }
+                          _isMode[3] = !_isMode[3];
+                        });
+                        print("ismode: $_isMode");
+                      },
+                      isclick: _isElvated[3],
+                      isclick2: _isElvated2[3],
+                      ismode: _isMode[3],
+                    ),
                   ],
                 ),
               ),
@@ -528,7 +619,12 @@ class Choiseroom extends StatelessWidget {
     //在此設定攝影機號碼
     final ThemeData themeData = Theme.of(context);
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        Navigator.pop(context);
+        Navigator.pushNamed(context, '/ModeScreen',arguments: {
+          'room':itemdata["name"],
+        });
+      },
       child: Container(
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20.0), color: COLOR_ROOM),
@@ -536,7 +632,7 @@ class Choiseroom extends StatelessWidget {
         margin: const EdgeInsets.only(left: 25),
         child: Center(
             child:
-                Text(itemdata["room"], style: themeData.textTheme.headline5)),
+                Text(itemdata["name"], style: themeData.textTheme.headline5)),
       ),
     );
   }

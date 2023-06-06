@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutterproject_second/custom/BorderBox.dart';
 import 'package:flutterproject_second/custom/Showup.dart';
+import 'package:flutterproject_second/utils/CamData.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
@@ -53,7 +54,7 @@ class SettingScreen extends StatelessWidget {
                   "新增攝影機",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: COLOR_GREEN,
+                    color: Colors.brown,
                   ),
                 ),
               ),
@@ -62,15 +63,23 @@ class SettingScreen extends StatelessWidget {
           Expanded(
             child: OverflowBox(
               maxWidth: size.width,
-              child: ListView.builder(
-                itemCount: (ROOM_DATA.length % 2 == 0)
-                    ? (ROOM_DATA.length.toDouble() / 2).toInt()
-                    : (ROOM_DATA.length.toDouble() / 2 + 1).toInt(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (BuildContext context, int index) {
-                  return Item(itemData: ROOM_DATA, i: index);
+              child: FutureBuilder(
+                future: getAllCam(),
+                builder: (context,AsyncSnapshot snapshot){
+                  if(snapshot.connectionState == ConnectionState.done){
+                    return ListView.builder(
+                      itemCount: (snapshot.data.length % 2 == 0)
+                          ? (snapshot.data.length.toDouble() / 2).toInt()
+                          : (snapshot.data.length.toDouble() / 2 + 1).toInt(),
+                      scrollDirection: Axis.vertical,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Item(itemData: snapshot.data, i: index);
+                      },
+                    );
+                  }
+                  else{return Center(child: CircularProgressIndicator(),);}
                 },
-              ),
+              )
             ),
           ),
         ],
@@ -91,7 +100,7 @@ class Item extends StatelessWidget {
     int a = i * 2;
     int b = a + 1;
     int Navint = 0;
-    print(ROOM_DATA.length);
+    //print(ROOM_DATA.length);
     print(b);
 
     double photosize = (MediaQuery.of(context).size.width - 50) / 2;
@@ -109,6 +118,7 @@ class Item extends StatelessWidget {
             },
             child: Container(
               decoration: BoxDecoration(
+                color: COLOR_ROOM,
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: COLOR_GREY),
               ),
@@ -117,14 +127,33 @@ class Item extends StatelessWidget {
               height: photosize,
               child: Stack(
                 children: [
-                  Center(child: Text(ROOM_DATA[a]['room']!)),
+                  Center(child: Container(
+                    width: 100,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: COLOR_ROOM,
+                    ),
+                    child: Center(
+                      child: Row(
+                        children: [
+                          Icon(Icons.house,color: Colors.white,),
+                          Text(itemData[a]["name"],
+                              style: TextStyle(
+                                  color: Colors.white60.withOpacity(0.8),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),),
                 ],
               ),
             ),
           ),
           GestureDetector(
             onTap: () {
-              if (b <= ROOM_DATA.length - 1) {
+              if (b <= itemData.length - 1) {
                 Navint = b;
               } else
                 Navint = 0;
@@ -134,8 +163,9 @@ class Item extends StatelessWidget {
                   arguments: {'index': Navint,}
               );
             },
-            child: (b <= ROOM_DATA.length - 1) ? Container(
+            child: (b <= itemData.length - 1) ? Container(
               decoration: BoxDecoration(
+                color: COLOR_ROOM,
                 borderRadius: BorderRadius.circular(15),
                 border: Border.all(color: COLOR_GREY),
               ),
@@ -144,7 +174,21 @@ class Item extends StatelessWidget {
               height: photosize,
               child:  Stack(
                 children: [
-                  Center(child: Text(ROOM_DATA[b]['room']!)),
+                  Center(child: Container(
+                    width: 100,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: COLOR_ROOM,
+                    ),
+                    child: Center(
+                      child: Text(itemData[b]["name"],
+                          style: TextStyle(
+                              color: Colors.white60.withOpacity(0.8),
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
+                    ),
+                  ),),
                 ],
               ),
             ):SizedBox.shrink(),

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterproject_second/screen/httptestScreen.dart';
+import 'package:flutterproject_second/utils/CamData.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
@@ -12,10 +13,24 @@ final sidePadding = EdgeInsets.symmetric(horizontal: padding, vertical: 0);
 class AddCamScreen extends StatefulWidget {
   @override
   _AddCamScreen createState() => _AddCamScreen();
+
 }
 
 class _AddCamScreen extends State<AddCamScreen> {
+
+  final _namecontroll =TextEditingController();
+  final _urlcontroll =TextEditingController();
+
+  dispose(){
+    _namecontroll.dispose();
+    _urlcontroll.dispose();
+    super.dispose();
+  }
+
   Widget build(BuildContext context) {
+
+
+
     final Size mediasize = MediaQuery.of(context).size;
     final ThemeData themeData = Theme.of(context);
     print(mediasize);
@@ -94,11 +109,13 @@ class _AddCamScreen extends State<AddCamScreen> {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             TextField(
+                              controller: _namecontroll,
                                 decoration: InputDecoration(
                                   labelText: "監視器名稱(ex:客廳)",
                                 )),
                             addVerticalSpace(padding),
                             TextField(
+                              controller: _urlcontroll,
                                 decoration: InputDecoration(
                                   labelText: "URL",
                                 )),
@@ -122,7 +139,11 @@ class _AddCamScreen extends State<AddCamScreen> {
                       style: OutlinedButton.styleFrom(
                         foregroundColor: Colors.brown,
                       ),
-                      onPressed: (){},
+                      onPressed: () async {
+                        print(_urlcontroll.text+" "+_namecontroll.text);
+                        addCam(_namecontroll.text, _urlcontroll.text);
+                        //Navigator.pop(context);
+                      },
                       child: Text("確認新增"),
                     )
                 )

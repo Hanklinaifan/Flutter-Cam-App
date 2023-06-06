@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterproject_second/custom/BorderBox.dart';
 import 'package:flutterproject_second/custom/MyButton.dart';
 import 'package:flutterproject_second/screen/AddCamScreen.dart';
+import 'package:flutterproject_second/utils/SusData.Dart.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
@@ -58,15 +59,30 @@ class _NoticeScreen extends State<NoticeScreen> {
               Padding(
                 padding: sidePadding,
                 child: Container(
-                  height: mediasize.height / 1.65,
-                  child: ListView.builder(
-                    itemCount: IMG_DATA.length,
-                    scrollDirection: Axis.vertical,
-                    itemBuilder: (context, index) {
-                      return NoticeItem(index: index);
+                  height: mediasize.height/1.65,
+                  child: FutureBuilder(
+                    future: getAllSus(),
+                    builder: (context,AsyncSnapshot snapshot){
+                      if(snapshot.connectionState == ConnectionState.done){
+                        if(snapshot.data == null){
+                          return Center(child: Text('尚無通知'),);
+                        }
+                        return  ListView.builder(
+                          itemCount: snapshot.data.length,
+                          scrollDirection: Axis.vertical,
+                          itemBuilder: (context, index) {
+                            return NoticeItem(index: index,
+                              SUSDATA: snapshot.data[index],);
+                          },
+                        );
+                      }
+                      else{
+                        return Center(child: CircularProgressIndicator());
+                      }
                     },
                   ),
-                ),
+                )
+
               )
             ],
           ),
@@ -78,15 +94,20 @@ class _NoticeScreen extends State<NoticeScreen> {
 
 class NoticeItem extends StatelessWidget {
   final index;
-
-  const NoticeItem({Key? key, required this.index}) : super(key: key);
+  final SUSDATA;
+  const NoticeItem({Key? key, required this.index, this.SUSDATA}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var itemimage = getSusPic(SUSDATA["imagepath"]);
+    var itemtime = SUSDATA["appear_time"];
+    var itemplace = SUSDATA["place"];
+    var itemvid = getSusVid(SUSDATA["videopath"]);
     final Size mediasize = MediaQuery.of(context).size;
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/SusScreen', arguments: {'index': index});
+        Navigator.pushNamed(context, '/SusScreen',
+            arguments: {'image': itemimage,'time':itemtime,'index':index,'place':itemplace,'video':itemvid});
       },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 10),
@@ -99,14 +120,14 @@ class NoticeItem extends StatelessWidget {
             Positioned(
                 top: 0,
                 right: 10,
-                child: Text(IMG_DATA[index]['time'].toString())),
+                child: Text(SUSDATA['appear_time'].toString())),
             Padding(
               padding: sidePadding,
               child: Align(
                   alignment: Alignment.center,
                   child: Row(
                     children: [
-                      Container(width: 60,height:60,child: ClipRRect(borderRadius: BorderRadius.circular(5),child: Image.asset(IMG_DATA[index]['image'].toString()))),
+                      Container(width: 60,height:60,child: ClipRRect(borderRadius: BorderRadius.circular(5),child: Image.network(getSusPic(SUSDATA['imagepath']),fit: BoxFit.cover,))),
                       addHorizontalSpace(20),
                       Text(
                         '有可疑人士出沒!',

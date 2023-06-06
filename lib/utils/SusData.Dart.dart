@@ -24,5 +24,5 @@ String getSusPic(String picuri){
 }
 
 String getSusVid(String viduri){
-  return http_getSusimg + "/$viduri";
+  return http_getSusvid + "/$viduri";
 }

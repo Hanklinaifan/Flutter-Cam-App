@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutterproject_second/custom/BorderBox.dart';
 import 'package:flutterproject_second/custom/Showup.dart';
+import 'package:flutterproject_second/utils/SusData.Dart.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
@@ -42,14 +43,28 @@ class AllsusScreen extends StatelessWidget {
           Expanded(
             child: OverflowBox(
               maxWidth: size.width,
-              child: ListView.builder(
-                itemCount: (IMG_DATA.length % 3 == 0)?(IMG_DATA.length.toDouble() / 3).toInt()
-                    :(IMG_DATA.length.toDouble() / 3 + 1).toInt(),
-                scrollDirection: Axis.vertical,
-                itemBuilder: (BuildContext context, int index) {
-                  return Item(itemData: IMG_DATA, i: index);
-                },
-              ),
+              child:FutureBuilder(
+                future: getAllSus(),
+              builder: (context, AsyncSnapshot snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  return Center(child: CircularProgressIndicator());
+                } else {
+                  var SUS_DATA = snapshot.data;
+                  //print(getSusPic(SUS_DATA[0]["videopath"]));
+                  if(SUS_DATA == null){
+                    return Center(child: Text('尚無可疑人士'));
+                  }
+                  return ListView.builder(
+                    itemCount: (SUS_DATA.length % 3 == 0)?(SUS_DATA.length.toDouble() / 3).toInt()
+                        :(SUS_DATA.length.toDouble() / 3 + 1).toInt(),
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Item(itemData: SUS_DATA, i: index);
+                    },
+                  );
+                }
+              }),
+
             ),
           ),
         ],
@@ -71,7 +86,7 @@ class Item extends StatelessWidget {
     int b = a + 1;
     int c = b + 1;
     int Navint = 0;
-print(IMG_DATA.length);
+
 
     double photosize = (MediaQuery.of(context).size.width - 50) / 3;
     return Container(
@@ -81,18 +96,21 @@ print(IMG_DATA.length);
           GestureDetector(
             onTap: () {
               Navint = a;
-              var itemimage = itemData[Navint]["image"];
-              var itemtime = itemData[Navint]["time"];
+              var itemimage = getSusPic(itemData[Navint]["imagepath"]);
+              var itemtime = itemData[Navint]["appear_time"];
+              // var itemplace = itemData[Navint]["place"];
               var itemplace = itemData[Navint]["place"];
+              var itemvid = getSusVid(itemData[Navint]["videopath"]);
               // print(Navint);
               Navigator.pushNamed(context, '/SusScreen',
-                  arguments: {'image': itemimage,'time': itemtime,'place': itemplace,'index': Navint});
+                  arguments: {'image': itemimage,'time': itemtime,'place': itemplace,'index': Navint, 'video': itemvid});
             },
             child: Container(
               margin: EdgeInsets.only(bottom: 10),
               width: photosize,
-              child: Image.asset(
-                itemData[a]["image"],
+              height: photosize,
+              child: Image.network(
+                getSusPic(itemData[a]["imagepath"]),
                 fit: BoxFit.cover,
               ),
             ),
@@ -102,43 +120,48 @@ print(IMG_DATA.length);
           GestureDetector(
             onTap: () {
 
-              if(b <= IMG_DATA.length-1){Navint = b;}
+              if(b <= itemData.length-1){Navint = b;}
 
               else Navint = 0;
-              var itemimage = itemData[Navint]["image"];
-              var itemtime = itemData[Navint]["time"];
+              var itemimage = getSusPic(itemData[b]["imagepath"]);
+              var itemtime = itemData[Navint]["appear_time"];
               var itemplace = itemData[Navint]["place"];
               // print(Navint);
+              var itemvid = getSusVid(itemData[b]["videopath"]);
               Navigator.pushNamed(context, '/SusScreen',
-                  arguments: {'image': itemimage,'time': itemtime,'place': itemplace,'index': Navint});
+                  arguments: {'image': itemimage,'time': itemtime,'place': itemplace,'index': Navint,'video': itemvid});
             },
             child: Container(
               margin: EdgeInsets.only(bottom: 10, left: 5),
               width: photosize,
-              child: (b <= IMG_DATA.length-1) ? Image.asset(
-                itemData[b]["image"],
-                fit: BoxFit.cover,
-              ):SizedBox.shrink(),
+              height: photosize,
+              child: (b <= itemData.length-1) ? Image.network(
+    getSusPic(itemData[b]["imagepath"]),
+    fit: BoxFit.cover,
+    ):SizedBox.shrink(),
             ),
           ),
           GestureDetector(
             onTap: () {
 
-              if(c <= IMG_DATA.length-1){Navint = c;}
+              if(c <= itemData.length-1){Navint = c;}
               else Navint =0;
-              var itemimage = itemData[Navint]["image"];
-              var itemtime = itemData[Navint]["time"];
+              var itemimage = getSusPic(itemData[c]["imagepath"]);
+              var itemtime = itemData[Navint]["appear_time"];
               var itemplace = itemData[Navint]["place"];
+              var itemvid = getSusVid(itemData[c]["videopath"]);
+
               Navigator.pushNamed(context, '/SusScreen',
-                  arguments: {'image': itemimage,'time': itemtime,'place': itemplace,'index':Navint});
+                  arguments: {'image': itemimage,'time': itemtime,'place': itemplace,'index':Navint,'video': itemvid});
             },
             child: Container(
               margin: EdgeInsets.only(bottom: 10, left: 5),
               width: photosize,
-              child: (c<=IMG_DATA.length-1)?Image.asset(
-                itemData[c]["image"],
-                fit: BoxFit.cover,
-              ):SizedBox.shrink(),
+              height: photosize,
+              child: (c<=itemData.length-1)?Image.network(
+    getSusPic(itemData[c]["imagepath"]),
+    fit: BoxFit.cover,
+    ):SizedBox.shrink(),
             ),
           ),
         ],

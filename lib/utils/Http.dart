@@ -8,8 +8,9 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 
 
 //url網址
-//final String comurl = "http://211.21.74.23:8088";
-final String comurl = "http://140.118.110.201:8080";
+final String comurl = "http://211.21.74.23:8000";
+final String localurl = "http://172.20.10.11:8000";
+//final String comurl = "http://140.118.110.201:8080";
 
 
 //MEMBER
@@ -38,7 +39,9 @@ final String http_getSusimg = comurl+"/sus/get/image";
 
 
 //CAM
+//取得CAM
+final String http_getCam = comurl+"/server/camera/info";
 //新增CAM
-final String http_addCam = comurl+"/camera/add";
+final String http_addCam = localurl+"/camera/add";
 //刪除CAM
-final String http_deleteCam = comurl+"/camera/delete";
+final String http_deleteCam = localurl+"/camera/delete";

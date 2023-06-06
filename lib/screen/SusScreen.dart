@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutterproject_second/custom/BorderBox.dart';
 import 'package:flutterproject_second/screen/AddCamScreen.dart';
+import 'package:flutterproject_second/utils/SusData.Dart.dart';
 import 'package:flutterproject_second/utils/constants.dart';
 import 'package:flutterproject_second/utils/sample_data.dart';
 import 'package:flutterproject_second/utils/widget_functions.dart';
@@ -15,9 +16,8 @@ class SusScreen extends StatefulWidget {
 
 class _SusScreen extends State<SusScreen> {
   @override
-  var _faceasset ;
-  var _timeasset ;
-  var _placeasset ;
+
+
 
   Widget build(BuildContext context) {
 
@@ -26,9 +26,17 @@ class _SusScreen extends State<SusScreen> {
     final double padding = 25;
     dynamic susinfo = ModalRoute.of(context)?.settings.arguments;
     var susindex = susinfo['index'];
+
+    var _faceasset  = susinfo['image'];
+    var _timeasset = susinfo["time"];
+    var _placeasset =susinfo["place"];
+    var _videoasset = susinfo["video"];
+    print(_videoasset);
+
     String Face_assets = IMG_DATA[susindex]['image'].toString();//susinfo["image"];
     String Time_assets = IMG_DATA[susindex]['time'].toString();//susinfo["time"];
     String Place_assets = IMG_DATA[susindex]['place'].toString();//susinfo["place"];
+
     final sidePadding = EdgeInsets.symmetric(horizontal: padding);
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -59,15 +67,17 @@ class _SusScreen extends State<SusScreen> {
             child: Padding(
               padding: sidePadding,
               child: Container(
-                  alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all()
+                ),
+                  //alignment: Alignment.center,
                   width: 250,
                   height: 250,
-                  child: ClipRRect(
-                      borderRadius: BorderRadius.circular(25),
-                      child: Image.asset(
-                        (_faceasset==null) ? Face_assets : _faceasset,
-                        fit: BoxFit.cover,
-                      ))
+                  child: (_faceasset==null) ? Image.asset(Face_assets):
+                  Image.network(
+                     _faceasset,
+                    fit: BoxFit.cover,
+                  )
               ),
             ),
           ),
@@ -90,12 +100,28 @@ class _SusScreen extends State<SusScreen> {
           addVerticalSpace(15),
           Container(
             height: 200,
-            child: PageView.builder(
-              itemCount: IMG_DATA.length,
-                scrollDirection: Axis.horizontal,
-                itemBuilder: (context,index){
-                  return Susvid(index: index,source: videosource,);
-                })
+            child: FutureBuilder(
+              future: getAllSus(),
+              builder: (context,snapshot){
+                if (snapshot.connectionState == ConnectionState.done){
+                  return PageView.builder(
+                        itemCount: IMG_DATA.length,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context,index){
+                            return Susvid(index: index,source: _videoasset,);
+                          });
+                }
+                else{
+                  return Center(child: CircularProgressIndicator(),);
+                }
+              },
+            ),
+            // child: PageView.builder(
+            //   itemCount: IMG_DATA.length,
+            //     scrollDirection: Axis.horizontal,
+            //     itemBuilder: (context,index){
+            //       return Susvid(index: index,source: _videoasset,);
+            //     })
           ),
 
           addVerticalSpace(30),
@@ -106,21 +132,34 @@ class _SusScreen extends State<SusScreen> {
           addVerticalSpace(10),
           Container(
             height: 110,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: IMG_DATA.length,
-              itemBuilder: (context, index) {
-                return Item(
-                  itemData: IMG_DATA[index],
-                  index: index,
-                  ontap: (){
-                    setState(() {
-                      _faceasset = IMG_DATA[index]['image'];
-                      _timeasset = IMG_DATA[index]['time'];
-                      _placeasset = IMG_DATA[index]['place'];
-                    });
-                  },
-                );
+            child: FutureBuilder(
+              future: getAllSus(),
+              builder: (context,AsyncSnapshot snapshot){
+
+                if(snapshot.connectionState == ConnectionState.done){
+                  var data = snapshot.data;
+                  return ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, index) {
+                          var image = getSusPic(data[index]['imagepath']);
+                          var video = getSusVid(data[index]['videopath']);
+                          var place = data[index]['place'];
+                          var time = data[index]['time'];
+
+                          return Item(
+                            itemData: snapshot.data[index],
+                            index: index,
+                            ontap: (){
+                              Navigator.pop(context);
+                              Navigator.pushNamed(context, '/SusScreen',
+                                  arguments: {'image': image,'time': time,'place': place,'index': index, 'video': video});
+                            },
+                          );
+                        },
+                      );
+                }
+                else return Center(child: CircularProgressIndicator(),);
               },
             ),
           ),
@@ -171,8 +210,8 @@ class Item extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 10),
         child: ClipRRect(
             borderRadius: BorderRadius.circular(25.0),
-            child: Image.asset(
-              itemData["image"],
+            child: Image.network(
+              getSusPic(itemData["imagepath"]),
               fit: BoxFit.cover,
             )),
       ),
@@ -185,6 +224,7 @@ class Susvid extends StatefulWidget {
   final String source;
   final index;
   const Susvid({Key? key,required this.index,required this.source}) : super(key: key);
+
 
   @override
   State<Susvid> createState() => _SusvidState();
@@ -209,6 +249,7 @@ class _SusvidState extends State<Susvid> {
 
   @override
   Widget build(BuildContext context) {
+
     return Padding(
       padding: sidePadding,
       child: Stack(
